@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'transaction_screen.dart';
 import 'log_screen.dart';
-
+import 'warehouse_screen.dart'; 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -13,11 +13,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0; 
 
-  
   final List<Widget> _screens = [
     const HomeScreen(), 
     const LogScreen(), 
-    const TransactionScreen(), 
+    const TransactionScreen(),
+    const WarehouseScreen(), 
   ];
 
   void _onItemTapped(int index) {
@@ -33,10 +33,12 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed, 
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: "Logs"),
           BottomNavigationBarItem(icon: Icon(Icons.sync), label: "Transactions"),
+          BottomNavigationBarItem(icon: Icon(Icons.warehouse), label: "Warehouse"), 
         ],
       ),
     );

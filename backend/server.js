@@ -10,6 +10,8 @@ import productRoutes from "./routes/product.route.js"
 import inventoryRoutes from "./routes/inventory.route.js"
 import transactionRoutes from "./routes/transaction.route.js"
 import logRoutes from "./routes/log.route.js"
+import warehouseRoutes from "./routes/warehouse.route.js"
+import locaionRoutes from "./routes/location.route.js"
 
 dotenv.config();
 
@@ -35,6 +37,8 @@ app.use("/api/product",productRoutes)
 app.use("/api/inventory",inventoryRoutes)
 app.use("/api/transaction",transactionRoutes)
 app.use("/api/log",logRoutes)
+app.use("/api/warehouse",warehouseRoutes)
+app.use("/api/location",locaionRoutes)
 
 
 app.get("/", (req, res) => {
