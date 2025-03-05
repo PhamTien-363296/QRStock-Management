@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import '/api_service.dart';
+import 'package:qrstock_app/service/warehouse_service.dart';
 import 'location_screen.dart';
 
 class WarehouseScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
   }
 
   Future<List<dynamic>> _fetchWarehouses() async {
-    final response = await ApiService.getAllWarehouses();
+    final response = await WarehouseService.getAllWarehouses();
     if (response["success"]) {
       return response["data"];
     } else {
@@ -58,7 +58,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
               final capacity = int.tryParse(capacityController.text) ?? 0;
 
               if (name.isNotEmpty && location.isNotEmpty && capacity > 0) {
-                final response = await ApiService.createWarehouse(name, location, capacity);
+                final response = await WarehouseService.createWarehouse(name, location, capacity);
                 if (response["success"]) {
                   Navigator.pop(context);
                   setState(() {

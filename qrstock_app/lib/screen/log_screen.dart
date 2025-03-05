@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
+import 'package:qrstock_app/service/monitor_service.dart';
 import 'package:intl/intl.dart';
 
 class LogScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class _LogScreenState extends State<LogScreen> {
   }
 
   Future<List<dynamic>> fetchLogs() async {
-    final result = await ApiService.getLogs();
+    final result = await MonitorService.getLogs();
     if (result["success"]) {
       return result["data"];
     } else {

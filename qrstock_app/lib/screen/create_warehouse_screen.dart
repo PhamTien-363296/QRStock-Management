@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/api_service.dart';
+import 'package:qrstock_app/service/warehouse_service.dart';
 
 class CreateWarehouseScreen extends StatefulWidget {
   const CreateWarehouseScreen({super.key});
@@ -30,7 +30,7 @@ class _CreateWarehouseScreenState extends State<CreateWarehouseScreen> {
       _isLoading = true;
     });
 
-    final response = await ApiService.createWarehouse(name, location, capacity);
+    final response = await WarehouseService.createWarehouse(name, location, capacity);
 
     setState(() {
       _isLoading = false;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'transaction_screen.dart';
-import 'log_screen.dart';
-import 'warehouse_screen.dart'; 
+import 'screen/transaction_screen.dart';
+import 'screen/log_screen.dart';
+import 'screen/warehouse_screen.dart'; 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 

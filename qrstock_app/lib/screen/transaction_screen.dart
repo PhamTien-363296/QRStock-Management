@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
+import 'package:qrstock_app/service/monitor_service.dart';
 
 class TransactionScreen extends StatefulWidget {
   const TransactionScreen({super.key});
@@ -18,7 +18,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
   }
 
   Future<List<dynamic>> fetchTransactions() async {
-    final result = await ApiService.getTransactions();
+    final result = await MonitorService.getTransactions();
     if (result["success"]) {
       return result["data"];
     } else {

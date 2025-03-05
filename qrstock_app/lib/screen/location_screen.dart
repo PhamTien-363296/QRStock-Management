@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
+import 'package:qrstock_app/service/location_service.dart';
 import 'product_screen.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -26,7 +26,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   Future<void> _fetchLocations() async {
     final warehouseId = widget.warehouse['_id'];
-    final result = await ApiService.getLocationsByWarehouseId(warehouseId);
+    final result = await LocationService.getLocationsByWarehouseId(warehouseId);
 
     if (result["success"]) {
       setState(() {
@@ -95,7 +95,7 @@ class _LocationScreenState extends State<LocationScreen> {
       return;
     }
 
-    final result = await ApiService.createLocation(warehouseId, shelf, bin, maxCapacity);
+    final result = await LocationService.createLocation(warehouseId, shelf, bin, maxCapacity);
 
     if (result["success"]) {
       ScaffoldMessenger.of(context).showSnackBar(

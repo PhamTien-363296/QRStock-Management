@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'api_service.dart';
+import 'package:qrstock_app/service/product_service.dart';
+import 'package:qrstock_app/service/inventory_service.dart';
 import 'dart:convert';
 
 
@@ -27,7 +28,7 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 
   Future<void> _fetchProducts() async {
-    final response = await ApiService.getProductsByWarehouseAndLocation(
+    final response = await ProductService.getProductsByWarehouseAndLocation(
       widget.warehouse['_id'].toString(),
       widget.location['_id'].toString(),
     );
@@ -84,7 +85,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   return;
                 }
 
-                final response = await ApiService.createProduct(
+                final response = await ProductService.createProduct(
                   widget.warehouse['_id'].toString(),
                   widget.location['_id'].toString(),
                   name,
@@ -259,7 +260,7 @@ class ProductCard extends StatelessWidget {
                   return;
                 }
 
-                final response = await ApiService.addInventory(
+                final response = await InventoryService.addInventory(
                   product["_id"],
                   warehouseId,
                   locationId,
