@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
+import 'package:qrstock_app/service/auth_service.dart';
 import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       _errorMessage = null;
     });
 
-    final result = await ApiService.signUp(
+    final result = await AuthService.signUp(
       usernameController.text,
       emailController.text,
       passwordController.text,

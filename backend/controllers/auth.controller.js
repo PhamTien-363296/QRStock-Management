@@ -6,18 +6,15 @@ export const signUp = async (req, res) => {
     try {
         const { username, email, password } = req.body;
 
-
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             return res.status(400).json({ error: "Định dạng email không hợp lệ" });
         }
 
-
         const user_tonTai = await User.findOne({ username });
         if (user_tonTai) {
             return res.status(400).json({ error: "Tên tài khoản đã được sử dụng" });
         }
-
 
         const email_tonTai = await User.findOne({ email });
         if (email_tonTai) {
@@ -28,10 +25,8 @@ export const signUp = async (req, res) => {
             return res.status(400).json({ error: "Mật khẩu ít nhất phải có 6 ký tự" });
         }
 
-
         const salt = await bcrypt.genSalt(10);
         const passwordhash = await bcrypt.hash(password, salt);
-
 
         const newUser = new User({
             username,
@@ -40,24 +35,23 @@ export const signUp = async (req, res) => {
         });
 
         if (newUser) {
-			generateTokenAndSetCookie(newUser._id, res);
-			await newUser.save();
+            const token = generateTokenAndSetCookie(newUser._id, res); 
+            await newUser.save();
 
-			res.status(201).json({
-				_id: newUser._id,
+            res.status(201).json({
+                _id: newUser._id,
                 username: newUser.username,
                 email: newUser.email,
-			});
-		} else {
-			res.status(400).json({ error: "Thông tin người dùng không hợp lệ" });
-		}
-
-      
+                token, 
+            });
+        } else {
+            res.status(400).json({ error: "Thông tin người dùng không hợp lệ" });
+        }
     } catch (error) {
         console.log("Lỗi dangKy controller", error.message);
         res.status(500).json({ error: "Lỗi 500" });
     }
-}
+};
 
  
 export const login = async (req,res)=>{

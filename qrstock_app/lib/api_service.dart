@@ -11,29 +11,29 @@ class ApiService {
   }
 
  
-  static Future<Map<String, dynamic>> signUp(String username, String email, String password) async {
-    final Uri url = Uri.parse("$baseUrl/api/auth/signup");
+  // static Future<Map<String, dynamic>> signUp(String username, String email, String password) async {
+  //   final Uri url = Uri.parse("$baseUrl/api/auth/signup");
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "username": username,
-          "email": email,
-          "password": password,
-        }),
-      );
+  //   try {
+  //     final response = await http.post(
+  //       url,
+  //       headers: {"Content-Type": "application/json"},
+  //       body: jsonEncode({
+  //         "username": username,
+  //         "email": email,
+  //         "password": password,
+  //       }),
+  //     );
 
-      if (response.statusCode == 201) {
-        return {"success": true, "data": jsonDecode(response.body)};
-      } else {
-        return {"success": false, "error": jsonDecode(response.body)["error"] ?? "Đăng ký thất bại"};
-      }
-    } catch (e) {
-      return {"success": false, "error": "Lỗi kết nối"};
-    }
-  }
+  //     if (response.statusCode == 201) {
+  //       return {"success": true, "data": jsonDecode(response.body)};
+  //     } else {
+  //       return {"success": false, "error": jsonDecode(response.body)["error"] ?? "Đăng ký thất bại"};
+  //     }
+  //   } catch (e) {
+  //     return {"success": false, "error": "Lỗi kết nối"};
+  //   }
+  // }
 
  
   static Future<Map<String, dynamic>> createProduct(

@@ -25,6 +25,35 @@ class AuthService {
     }
   }
 
+  static Future<Map<String, dynamic>> signUp(
+      String username, String email, String password) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/api/auth/signup"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "username": username,
+        "email": email,
+        "password": password,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+
+      
+      if (data["token"] != null) {
+        await _saveToken(data["token"]);
+        LogService.info("JWT Saved: ${data["token"]}");
+      }
+
+      return {"success": true, "data": data};
+    } else {
+      final errorData = jsonDecode(response.body);
+      LogService.error("Signup failed: ${errorData["error"]}");
+      return {"success": false, "error": errorData["error"] ?? "Signup failed"};
+    }
+  }
+
   static Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("jwt_token", token);
