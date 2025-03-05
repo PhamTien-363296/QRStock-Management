@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:qrstock_app/login_screen.dart';
 import 'api_service.dart';
-import 'create_product_screen.dart';
+// import 'create_product_screen.dart';
 
 final Logger logger = Logger();
 
@@ -46,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _navigateToCreateProduct() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CreateProductScreen()),
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
     );
     if (result == true) {
       fetchProducts();

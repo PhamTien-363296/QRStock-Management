@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart'; // Import ApiService
+import 'api_service.dart';
+import 'product_screen.dart';
 
 class LocationScreen extends StatefulWidget {
   final dynamic warehouse;
@@ -101,13 +102,26 @@ class _LocationScreenState extends State<LocationScreen> {
         const SnackBar(content: Text("Thêm Location thành công!")),
       );
       Navigator.pop(context);
-      _fetchLocations(); // Refresh danh sách location
+      _fetchLocations(); // Cập nhật danh sách location
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi: ${result['error']}")),
       );
     }
   }
+
+  void _navigateToProductScreen(dynamic location) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => ProductScreen(
+        location: location,  
+        warehouse: widget.warehouse,  
+      ),
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -122,9 +136,9 @@ class _LocationScreenState extends State<LocationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Địa điểm: ${widget.warehouse['location']}", style: const TextStyle(fontSize: 18)),
+                      Text("📍 Địa điểm: ${widget.warehouse['location']}", style: const TextStyle(fontSize: 18)),
                       const SizedBox(height: 10),
-                      Text("Sức chứa: ${widget.warehouse['capacity']}", style: const TextStyle(fontSize: 18)),
+                      Text("📦 Sức chứa: ${widget.warehouse['capacity']}", style: const TextStyle(fontSize: 18)),
                     ],
                   ),
                 ),
@@ -140,6 +154,17 @@ class _LocationScreenState extends State<LocationScreen> {
                               child: ListTile(
                                 title: Text("Kệ: ${location['shelf']} - Ngăn: ${location['bin']}"),
                                 subtitle: Text("Sức chứa: ${location['max_capacity']}"),
+                                trailing: ElevatedButton(
+                                  onPressed: () => _navigateToProductScreen(location),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey[300], // Nút màu xám
+                                    foregroundColor: Colors.black, // Chữ màu đen
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text("Chi tiết"),
+                                ),
                               ),
                             );
                           },

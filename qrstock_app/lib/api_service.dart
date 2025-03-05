@@ -36,32 +36,40 @@ class ApiService {
   }
 
  
-  static Future<Map<String, dynamic>> createProduct(String name, String description) async {
-    final Uri url = Uri.parse("$baseUrl/api/product/create");
-    final token = await _getToken();
+  static Future<Map<String, dynamic>> createProduct(
+  String warehouseId,
+  String locationId,
+  String name,
+  String description,
+) async {
+  final Uri url = Uri.parse("$baseUrl/api/product/create/$warehouseId/$locationId");
+  final token = await _getToken();
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
-        body: jsonEncode({
-          "name": name,
-          "description": description,
-        }),
-      );
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "name": name,
+        "description": description,
+      }),
+    );
 
-      if (response.statusCode == 201) {
-        return {"success": true, "data": jsonDecode(response.body)};
-      } else {
-        return {"success": false, "error": jsonDecode(response.body)["error"] ?? "Tạo sản phẩm thất bại"};
-      }
-    } catch (e) {
-      return {"success": false, "error": "Lỗi kết nối"};
+    if (response.statusCode == 201) {
+      return {"success": true, "data": jsonDecode(response.body)};
+    } else {
+      return {
+        "success": false,
+        "error": jsonDecode(response.body)["message"] ?? "Tạo sản phẩm thất bại"
+      };
     }
+  } catch (e) {
+    return {"success": false, "error": "Lỗi kết nối: $e"};
   }
+}
 
   
   static Future<Map<String, dynamic>> getProducts() async {

@@ -1,14 +1,12 @@
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-    name: 
-    { 
+    name: { 
         type: String,
         required: true,
         unique: true 
     },
-    qr_code: 
-    { 
+    qr_code: { 
         type: String,
         required: true, 
         unique: true 
@@ -16,8 +14,18 @@ const productSchema = new mongoose.Schema({
     description: {
         type: String,
     },
+    warehouse_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Warehouse", 
+        required: true 
+    },
+    location_id: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "Location", 
+        required: true 
+    },
 });
 
-const Product = mongoose.model("Product", productSchema,"Product");
+const Product = mongoose.model("Product", productSchema, "Product");
 
 export default Product;
