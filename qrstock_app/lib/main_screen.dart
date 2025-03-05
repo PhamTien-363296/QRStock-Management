@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'transaction_screen.dart';
+import 'log_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   
   final List<Widget> _screens = [
     const HomeScreen(), 
-    const Center(child: Text("Hiện log", style: TextStyle(fontSize: 24))), 
+    const LogScreen(), 
     const TransactionScreen(), 
   ];
 

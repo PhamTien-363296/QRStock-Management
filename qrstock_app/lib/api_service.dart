@@ -166,4 +166,32 @@ class ApiService {
   }
 }
 
+static Future<Map<String, dynamic>> getLogs() async {
+  final Uri url = Uri.parse("$baseUrl/api/log/get");
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      final List<dynamic> logs = responseBody["data"] ?? []; 
+
+      return {"success": true, "data": logs};
+    } else {
+      return {
+        "success": false,
+        "error": jsonDecode(response.body)["error"] ?? "Lỗi khi lấy danh sách log"
+      };
+    }
+  } catch (e) {
+    return {"success": false, "error": "Lỗi kết nối"};
+  }
+}
+
+
 }
