@@ -31,7 +31,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() {
       _isLoading = false;
       if (result["success"]) {
-        // Chuyển về màn hình đăng nhập
+        
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),

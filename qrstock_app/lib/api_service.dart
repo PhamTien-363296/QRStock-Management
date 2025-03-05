@@ -72,28 +72,6 @@ class ApiService {
 }
 
   
-  static Future<Map<String, dynamic>> getProducts() async {
-    final Uri url = Uri.parse("$baseUrl/api/product/get");
-    final token = await _getToken();
-
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
-      );
-
-      if (response.statusCode == 200) {
-        return {"success": true, "data": jsonDecode(response.body)["products"]};
-      } else {
-        return {"success": false, "error": "Lỗi khi lấy sản phẩm"};
-      }
-    } catch (e) {
-      return {"success": false, "error": "Lỗi kết nối"};
-    }
-  }
 
   
   static Future<Map<String, dynamic>> addInventory(String productId, int quantity, String location) async {
@@ -304,6 +282,34 @@ static Future<Map<String, dynamic>> getLocationsByWarehouseId(String warehouseId
     return {"success": false, "error": "Lỗi kết nối"};
   }
 }
+
+static Future<Map<String, dynamic>> getProductsByWarehouseAndLocation(
+    String warehouseId, String locationId) async {
+  final Uri url = Uri.parse("$baseUrl/api/product/get/$warehouseId/$locationId");
+  final token = await _getToken();
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return {"success": true, "data": jsonDecode(response.body)["products"]};
+    } else {
+      return {
+        "success": false,
+        "error": jsonDecode(response.body)["message"] ?? "Lỗi khi lấy danh sách sản phẩm"
+      };
+    }
+  } catch (e) {
+    return {"success": false, "error": "Lỗi kết nối: $e"};
+  }
+}
+
 
 
 
