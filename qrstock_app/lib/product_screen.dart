@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'api_service.dart';
+import 'dart:convert';
+
 
 class ProductScreen extends StatefulWidget {
   final dynamic location;
@@ -92,7 +94,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 if (response['success']) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sản phẩm đã được thêm thành công!')));
                   Navigator.pop(context);
-                  _fetchProducts(); // Cập nhật danh sách sản phẩm sau khi thêm
+                  _fetchProducts(); 
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['error'])));
                 }
@@ -155,7 +157,6 @@ class _ProductScreenState extends State<ProductScreen> {
   }
 }
 
-// Widget để hiển thị từng sản phẩm dưới dạng card đẹp
 class ProductCard extends StatelessWidget {
   final dynamic product;
 
@@ -173,10 +174,10 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hiển thị QR Code từ _id
+            
             Center(
               child: QrImageView(
-                data: product["_id"], // Dữ liệu QR là ID của sản phẩm
+                data: jsonEncode({"name": product["name"], "id": product["_id"]}), 
                 size: 100,
                 backgroundColor: Colors.white,
               ),
