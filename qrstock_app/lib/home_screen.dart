@@ -54,75 +54,72 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showAddInventoryDialog(String productId) {
-  TextEditingController quantityController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
+    TextEditingController quantityController = TextEditingController();
+    TextEditingController locationController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text("Add Inventory"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: quantityController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: "Quantity"),
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Add Inventory"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: quantityController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Quantity"),
+              ),
+              TextField(
+                controller: locationController,
+                decoration: const InputDecoration(labelText: "Location"),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
             ),
-            TextField(
-              controller: locationController,
-              decoration: const InputDecoration(labelText: "Location"),
+            ElevatedButton(
+              onPressed: () async {
+                int? quantity = int.tryParse(quantityController.text);
+                String location = locationController.text.trim();
+
+                if (quantity == null || quantity <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Quantity phải là số lớn hơn 0")),
+                  );
+                  return;
+                }
+                if (location.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Location không được để trống")),
+                  );
+                  return;
+                }
+
+                final result = await ApiService.addInventory(productId, quantity, location);
+                Navigator.pop(context);
+
+                if (result["success"]) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Inventory added successfully!")),
+                  );
+                  await fetchProducts(); // Cập nhật danh sách để ẩn nút
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Lỗi: ${result["error"]}")),
+                  );
+                }
+              },
+              child: const Text("Add"),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              int? quantity = int.tryParse(quantityController.text);
-              String location = locationController.text.trim();
-
-           
-              if (quantity == null || quantity <= 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Quantity phải là số lớn hơn 0")),
-                );
-                return;
-              }
-              if (location.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Location không được để trống")),
-                );
-                return;
-              }
-
-              final result = await ApiService.addInventory(productId, quantity, location);
-              Navigator.pop(context); 
-
-              
-              if (result["success"]) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Inventory added successfully!")),
-                );
-                fetchProducts();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Lỗi: ${result["error"]}")),
-                );
-              }
-            },
-            child: const Text("Add"),
-          ),
-        ],
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -198,10 +195,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           tileColor: Colors.grey[200],
-          trailing: ElevatedButton(
-            onPressed: () => _showAddInventoryDialog(product["_id"]),
-            child: const Text("Add Inventory"),
-          ),
+          trailing: (inventory.isEmpty)
+              ? ElevatedButton(
+                  onPressed: () => _showAddInventoryDialog(product["_id"]),
+                  child: const Text("Add Inventory"),
+                )
+              : null, // Ẩn nút nếu đã có inventory
         ),
       );
     } catch (e) {

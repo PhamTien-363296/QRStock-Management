@@ -10,7 +10,7 @@ class ApiService {
     return prefs.getString("jwt_token");
   }
 
-  /// Đăng ký tài khoản
+ 
   static Future<Map<String, dynamic>> signUp(String username, String email, String password) async {
     final Uri url = Uri.parse("$baseUrl/api/auth/signup");
 
@@ -38,13 +38,14 @@ class ApiService {
  
   static Future<Map<String, dynamic>> createProduct(String name, String description) async {
     final Uri url = Uri.parse("$baseUrl/api/product/create");
-   
+    final token = await _getToken();
 
     try {
       final response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
+          if (token != null) "Authorization": "Bearer $token",
         },
         body: jsonEncode({
           "name": name,
@@ -62,7 +63,7 @@ class ApiService {
     }
   }
 
-  /// Lấy danh sách sản phẩm
+  
   static Future<Map<String, dynamic>> getProducts() async {
     final Uri url = Uri.parse("$baseUrl/api/product/get");
     final token = await _getToken();
@@ -120,7 +121,7 @@ class ApiService {
     }
   }
 
-  /// Lấy thông tin tồn kho của sản phẩm
+ 
   static Future<Map<String, dynamic>> getInventoryInfo(String productId) async {
     final Uri url = Uri.parse("$baseUrl/api/inventory/get/information/$productId");
     final token = await _getToken();
@@ -143,4 +144,26 @@ class ApiService {
       return {"success": false, "error": "Lỗi kết nối"};
     }
   }
+
+  static Future<Map<String, dynamic>> getTransactions() async {
+  final Uri url = Uri.parse("$baseUrl/api/transaction/get");
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return {"success": true, "data": jsonDecode(response.body)["data"]};
+    } else {
+      return {"success": false, "error": jsonDecode(response.body)["error"] ?? "Lỗi khi lấy danh sách giao dịch"};
+    }
+  } catch (e) {
+    return {"success": false, "error": "Lỗi kết nối"};
+  }
+}
+
 }

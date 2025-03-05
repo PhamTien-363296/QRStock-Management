@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import Transaction from "../models/transaction.model.js";
+import Log from "../models/log.model.js";
+
 
 export const addInventory = async (req, res) => {
     try {
@@ -43,6 +45,12 @@ export const addInventory = async (req, res) => {
             timestamp: new Date(),
         });
         await transaction.save();
+
+        const log = new Log({
+            user_id,
+            action: `Added inventory successfully - Product ID: ${productId}, Quantity: ${quantity}, Location: ${location}`,
+        });
+        await log.save();
 
         res.status(201).json({
             success: true,

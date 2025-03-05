@@ -8,6 +8,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.route.js"
 import productRoutes from "./routes/product.route.js"
 import inventoryRoutes from "./routes/inventory.route.js"
+import transactionRoutes from "./routes/transaction.route.js"
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(
 app.use("/api/auth",authRoutes)
 app.use("/api/product",productRoutes)
 app.use("/api/inventory",inventoryRoutes)
+app.use("/api/transaction",transactionRoutes)
 
 
 app.get("/", (req, res) => {
