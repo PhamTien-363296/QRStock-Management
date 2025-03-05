@@ -74,38 +74,42 @@ class ApiService {
   
 
   
-  static Future<Map<String, dynamic>> addInventory(String productId, int quantity, String location) async {
-    final Uri url = Uri.parse("$baseUrl/api/inventory/add/$productId");
-    final token = await _getToken();
+static Future<Map<String, dynamic>> addInventory(
+    String productId, String warehouseId, String locationId, int quantity, String batch, String expiryDate) async {
+  
+  final Uri url = Uri.parse("$baseUrl/api/inventory/add/$productId/$warehouseId/$locationId");
+  final token = await _getToken();
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
-        body: jsonEncode({
-          "quantity": quantity,
-          "location": location,
-        }),
-      );
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        if (token != null) "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "quantity": quantity,
+        "batch": batch,
+        "expiry_date": expiryDate, 
+      }),
+    );
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
 
-        if (data["data"]["transaction"] == null) {
-          return {"success": false, "error": "Transaction không được lưu!"};
-        }
-
-        return {"success": true, "data": data["data"]};
-      } else {
-        return {"success": false, "error": jsonDecode(response.body)["error"] ?? "Lỗi khi thêm inventory"};
+      if (data["data"]["transaction"] == null || data["data"]["log"] == null) {
+        return {"success": false, "error": "Transaction hoặc Log không được lưu!"};
       }
-    } catch (e) {
-      return {"success": false, "error": "Lỗi kết nối"};
+
+      return {"success": true, "data": data["data"]};
+    } else {
+      return {"success": false, "error": jsonDecode(response.body)["error"] ?? "Lỗi khi thêm inventory"};
     }
+  } catch (e) {
+    return {"success": false, "error": "Lỗi kết nối"};
   }
+}
+
 
  
   static Future<Map<String, dynamic>> getInventoryInfo(String productId) async {

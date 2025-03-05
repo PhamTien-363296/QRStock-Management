@@ -129,7 +129,7 @@ class _ProductScreenState extends State<ProductScreen> {
               child: const Text("Thêm Sản phẩm"),
             ),
             const SizedBox(height: 20),
-            const Text("Danh sách sản phẩm:", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text("Danh sách sản phẩm:", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : products.isEmpty
@@ -137,19 +137,25 @@ class _ProductScreenState extends State<ProductScreen> {
                     : Expanded(
                         child: GridView.builder(
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // 2 card mỗi hàng
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                              childAspectRatio: 2, // Điều chỉnh tỉ lệ chiều rộng & cao của thẻ
-                              mainAxisExtent: 200, // Đặt chiều cao cố định cho card
-                            ),
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 2,
+                            mainAxisExtent: 230, 
+                          ),
                           itemCount: products.length,
                           itemBuilder: (context, index) {
                             final product = products[index];
-                            return ProductCard(product: product);
+                            return ProductCard(
+                              product: product,
+                              warehouseId: widget.warehouse['_id'],
+                              locationId: widget.location['_id'],
+                              onInventoryUpdated: _fetchProducts, 
+                            );
                           },
                         ),
                       ),
+
           ],
         ),
       ),
@@ -159,25 +165,142 @@ class _ProductScreenState extends State<ProductScreen> {
 
 class ProductCard extends StatelessWidget {
   final dynamic product;
+  final String warehouseId;
+  final String locationId;
+  final VoidCallback onInventoryUpdated;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({
+    super.key,
+    required this.product,
+    required this.warehouseId,
+    required this.locationId,
+    required this.onInventoryUpdated,
+  });
+
+  void _showAddInventoryDialog(BuildContext context) {
+    TextEditingController quantityController = TextEditingController();
+    TextEditingController batchController = TextEditingController();
+    DateTime? expiryDate;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Thêm tồn kho - ${product['name']}"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: quantityController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Số lượng"),
+              ),
+              TextField(
+                controller: batchController,
+                decoration: const InputDecoration(labelText: "Số Batch"),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      expiryDate == null
+                          ? "Chọn ngày hết hạn"
+                          : "HSD: ${expiryDate!.toLocal()}".split(' ')[0],
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.calendar_today),
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        expiryDate = pickedDate;
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Hủy"),
+            ),
+            TextButton(
+              onPressed: () async {
+                int? quantity = int.tryParse(quantityController.text);
+                String batch = batchController.text.trim();
+
+                if (quantity == null || quantity <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Vui lòng nhập số lượng hợp lệ!")),
+                  );
+                  return;
+                }
+
+                if (batch.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Vui lòng nhập Số Batch!")),
+                  );
+                  return;
+                }
+
+                if (expiryDate == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Vui lòng chọn Ngày hết hạn!")),
+                  );
+                  return;
+                }
+
+                final response = await ApiService.addInventory(
+                  product["_id"],
+                  warehouseId,
+                  locationId,
+                  quantity,
+                  batch,
+                  expiryDate!.toIso8601String(),
+                );
+
+                if (response["success"]) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Thêm tồn kho thành công!")),
+                  );
+                  onInventoryUpdated(); // Refresh danh sách
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(response["error"] ?? "Lỗi khi thêm inventory")),
+                  );
+                }
+              },
+              child: const Text("Thêm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      elevation: 4, // Độ nổi của card
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 4,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             Center(
               child: QrImageView(
-                data: jsonEncode({"name": product["name"], "id": product["_id"]}), 
+                data: jsonEncode({"name": product["name"], "id": product["_id"]}),
                 size: 100,
                 backgroundColor: Colors.white,
               ),
@@ -189,7 +312,6 @@ class ProductCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 5),
             Text(
               product['description'],
               style: const TextStyle(fontSize: 10, color: Colors.grey),
@@ -197,12 +319,18 @@ class ProductCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             const Spacer(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Text(
-                "#${product['_id'].toString().substring(0, 6)}", // Hiển thị ID ngắn gọn
-                style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "#${product['_id'].toString().substring(0, 6)}",
+                  style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add, color: Colors.green),
+                  onPressed: () => _showAddInventoryDialog(context),
+                ),
+              ],
             ),
           ],
         ),
@@ -210,3 +338,5 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
+
+
