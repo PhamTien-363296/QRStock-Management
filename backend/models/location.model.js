@@ -17,10 +17,7 @@ const locationSchema = new mongoose.Schema({
   max_capacity: { 
     type: Number,
      required: true
-     },
-  qr_code: { 
-    type: String 
-}
+     }
 }, { timestamps: true });
 
 const Location = mongoose.model("Location", locationSchema,"Location");

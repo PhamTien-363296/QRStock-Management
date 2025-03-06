@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const Review = () => {
-  const { warehouse_id, location_id } = useParams();
+  const { warehouse_id, location_id,product_id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,7 +12,7 @@ const Review = () => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `https://3027-42-114-203-46.ngrok-free.app/api/product/get/${warehouse_id}/${location_id}`
+          `/api/product/g/${warehouse_id}/${location_id}/${product_id}`
         );
         
         if (response.data.success && response.data.products.length > 0) {
@@ -30,7 +30,7 @@ const Review = () => {
     };
 
     fetchProduct();
-  }, [warehouse_id, location_id]);
+  }, [warehouse_id, location_id, product_id]);
 
   if (loading)
     return (

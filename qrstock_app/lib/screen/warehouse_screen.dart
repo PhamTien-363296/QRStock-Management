@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qrstock_app/service/warehouse_service.dart';
 import 'location_screen.dart';
 
@@ -103,25 +102,16 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
                   title: Text(warehouse["name"],
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   subtitle: Text("Location: ${warehouse['location']}"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.info, color: Color.fromARGB(255, 158, 158, 158)),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LocationScreen(warehouse: warehouse),
-                            ),
-                          );
-                        },
-                      ),
-                      QrImageView(
-                        data: warehouse["_id"],
-                        size: 50,
-                      ),
-                    ],
+                  trailing: IconButton(
+                    icon: const Icon(Icons.info, color: Color.fromARGB(255, 158, 158, 158)),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LocationScreen(warehouse: warehouse),
+                        ),
+                      );
+                    },
                   ),
                   onTap: () => _showWarehouseDetails(warehouse),
                 ),
@@ -148,7 +138,7 @@ class _WarehouseScreenState extends State<WarehouseScreen> {
             Text("Location: ${warehouse['location']}"),
             Text("Capacity: ${warehouse['capacity']}"),
             const SizedBox(height: 10),
-            QrImageView(data: warehouse["_id"], size: 100),
+            
           ],
         ),
         actions: [

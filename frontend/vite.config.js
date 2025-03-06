@@ -9,8 +9,9 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "http://localhost:5000", 
         changeOrigin: true,
+        secure: false, 
       }
     },
     headers: {
@@ -18,11 +19,11 @@ export default defineConfig({
       Pragma: "no-cache",
       Expires: "0",
     },
-    host: "0.0.0.0", 
+    host: "localhost", 
     strictPort: true,
     hmr: {
       clientPort: 443,
     },
-    allowedHosts: ["3027-42-114-203-46.ngrok-free.app"], 
+    allowedHosts: true,
   }
 })

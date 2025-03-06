@@ -5,7 +5,7 @@ function App() {
   return (
 
       <Routes>
-        <Route path='product/get/:warehouse_id/:location_id' element={<Review />} />
+        <Route path='product/g/:warehouse_id/:location_id/:product_id' element={<Review />} />
       </Routes>
   
   );

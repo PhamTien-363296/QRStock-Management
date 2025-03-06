@@ -5,6 +5,8 @@ import Transaction from "../models/transaction.model.js";
 import Log from "../models/log.model.js";
 import Warehouse from "../models/warehouse.model.js";
 import Location from "../models/location.model.js";
+import { toDataURL } from "qrcode";
+import { v4 as uuidv4 } from 'uuid';
 
 
 export const addInventory = async (req, res) => {
@@ -36,6 +38,20 @@ export const addInventory = async (req, res) => {
             return res.status(400).json({ success: false, error: "Số lượng không hợp lệ" });
         }
 
+        
+        if (quantity > location.max_capacity) {
+            return res.status(400).json({ success: false, error: "Số lượng vượt quá dung lượng của vị trí" });
+        }
+
+        location.max_capacity -= quantity; 
+        await location.save();
+
+        
+        const qrData = `https://94d0-42-114-203-46.ngrok-free.app/product/g/${warehouse_id}/${location_id}/${product_id}?timestamp=${new Date().getTime()}&unique_id=${uuidv4()}`;
+        const qrCode = await toDataURL(qrData);
+
+
+
         let inventory = await Inventory.findOne({ product_id: productId, warehouse_id: warehouseId, location_id: locationId });
 
         if (inventory) {
@@ -47,11 +63,14 @@ export const addInventory = async (req, res) => {
                 location_id: locationId, 
                 quantity, 
                 batch, 
-                expiry_date 
+                expiry_date ,
+                qr_code: qrCode,
             });
         }
         await inventory.save();
 
+        product.qr_code = qrCode;
+        await product.save();
 
         const transaction = new Transaction({
             product_id: productId,
@@ -82,6 +101,8 @@ export const addInventory = async (req, res) => {
         res.status(500).json({ success: false, error: "Lỗi server" });
     }
 };
+
+
 
 
 
