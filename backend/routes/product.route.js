@@ -4,6 +4,6 @@ import { protectRoute } from "../middleware/protectRoute.js"
 const router = express.Router()
 
 router.post("/create/:warehouse_id/:location_id", protectRoute, createProduct);
-router.get("/get/:warehouse_id/:location_id",protectRoute,getProductByWarehouseAndLocationId)
+router.get("/get/:warehouse_id/:location_id",getProductByWarehouseAndLocationId)
 
 export default router
