@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:qrstock_app/service/product_service.dart';
 import 'package:qrstock_app/service/inventory_service.dart';
+import 'package:qrstock_app/service/product_service.dart';
 import 'dart:convert';
-
 
 class ProductScreen extends StatefulWidget {
   final dynamic location;
@@ -95,7 +93,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 if (response['success']) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sản phẩm đã được thêm thành công!')));
                   Navigator.pop(context);
-                  _fetchProducts(); 
+                  _fetchProducts();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['error'])));
                 }
@@ -108,77 +106,7 @@ class _ProductScreenState extends State<ProductScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Sản phẩm tại ${widget.location['shelf']} - ${widget.location['bin']}")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Kho hàng: ${widget.warehouse['name']}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text("Địa chỉ: ${widget.warehouse['location']}", style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 10),
-            Text("Vị trí: Kệ ${widget.location['shelf']} - Ngăn ${widget.location['bin']}", style: const TextStyle(fontSize: 18)),
-            Text("Sức chứa: ${widget.location['max_capacity']}", style: const TextStyle(fontSize: 18)),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                await _showAddProductDialog(context);
-              },
-              child: const Text("Thêm Sản phẩm"),
-            ),
-            const SizedBox(height: 20),
-            const Text("Danh sách sản phẩm:", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : products.isEmpty
-                    ? const Text("Không có sản phẩm nào.", style: TextStyle(fontSize: 16))
-                    : Expanded(
-                        child: GridView.builder(
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                            childAspectRatio: 2,
-                            mainAxisExtent: 230, 
-                          ),
-                          itemCount: products.length,
-                          itemBuilder: (context, index) {
-                            final product = products[index];
-                            return ProductCard(
-                              product: product,
-                              warehouseId: widget.warehouse['_id'],
-                              locationId: widget.location['_id'],
-                              onInventoryUpdated: _fetchProducts, 
-                            );
-                          },
-                        ),
-                      ),
-
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final dynamic product;
-  final String warehouseId;
-  final String locationId;
-  final VoidCallback onInventoryUpdated;
-
-  const ProductCard({
-    super.key,
-    required this.product,
-    required this.warehouseId,
-    required this.locationId,
-    required this.onInventoryUpdated,
-  });
-
-  void _showAddInventoryDialog(BuildContext context) {
+  Future<void> _showAddInventoryDialog(BuildContext context, dynamic product) async {
     TextEditingController quantityController = TextEditingController();
     TextEditingController batchController = TextEditingController();
     DateTime? expiryDate;
@@ -221,7 +149,9 @@ class ProductCard extends StatelessWidget {
                         lastDate: DateTime(2100),
                       );
                       if (pickedDate != null) {
-                        expiryDate = pickedDate;
+                        setState(() {
+                          expiryDate = pickedDate;
+                        });
                       }
                     },
                   ),
@@ -262,8 +192,8 @@ class ProductCard extends StatelessWidget {
 
                 final response = await InventoryService.addInventory(
                   product["_id"],
-                  warehouseId,
-                  locationId,
+                  widget.warehouse['_id'].toString(),
+                  widget.location['_id'].toString(),
                   quantity,
                   batch,
                   expiryDate!.toIso8601String(),
@@ -273,11 +203,11 @@ class ProductCard extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Thêm tồn kho thành công!")),
                   );
-                  onInventoryUpdated(); // Refresh danh sách
                   Navigator.pop(context);
+                  _fetchProducts();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(response["error"] ?? "Lỗi khi thêm inventory")),
+                    SnackBar(content: Text(response["error"] ?? "Lỗi khi thêm tồn kho")),
                   );
                 }
               },
@@ -291,6 +221,80 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Sản phẩm tại ${widget.location['shelf']} - ${widget.location['bin']}")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Kho hàng: ${widget.warehouse['name']}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text("Địa chỉ: ${widget.warehouse['location']}", style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
+            Text("Vị trí: Kệ ${widget.location['shelf']} - Ngăn ${widget.location['bin']}", style: const TextStyle(fontSize: 18)),
+            Text("Sức chứa: ${widget.location['max_capacity']}", style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                await _showAddProductDialog(context);
+              },
+              child: const Text("Thêm Sản phẩm"),
+            ),
+            const SizedBox(height: 20),
+            const Text("Danh sách sản phẩm:", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : products.isEmpty
+                    ? const Text("Không có sản phẩm nào.", style: TextStyle(fontSize: 16))
+                    : Expanded(
+                        child: GridView.builder(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                            childAspectRatio: 2,
+                            mainAxisExtent: 230,
+                          ),
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            final product = products[index];
+                            return ProductCard(
+                              product: product,
+                              warehouseId: widget.warehouse['_id'],
+                              locationId: widget.location['_id'],
+                              onInventoryUpdated: _fetchProducts,
+                              onAddInventoryPressed: (product) {
+                                _showAddInventoryDialog(context, product);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ProductCard extends StatelessWidget {
+  final dynamic product;
+  final String warehouseId;
+  final String locationId;
+  final VoidCallback onInventoryUpdated;
+  final void Function(dynamic product) onAddInventoryPressed;
+
+  const ProductCard({
+    super.key,
+    required this.product,
+    required this.warehouseId,
+    required this.locationId,
+    required this.onInventoryUpdated,
+    required this.onAddInventoryPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
@@ -300,11 +304,13 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: QrImageView(
-                data: jsonEncode({"name": product["name"], "id": product["_id"]}),
-                size: 100,
-                backgroundColor: Colors.white,
-              ),
+              child: product['qr_code'] != null && product['qr_code'].isNotEmpty
+                  ? Image.memory(
+                      base64Decode(product['qr_code'].split(',')[1]),
+                      width: 100,
+                      height: 100,
+                    )
+                  : const Text("Không có QR Code"),
             ),
             const SizedBox(height: 10),
             Text(
@@ -329,7 +335,7 @@ class ProductCard extends StatelessWidget {
                 ),
                 IconButton(
                   icon: const Icon(Icons.add, color: Colors.green),
-                  onPressed: () => _showAddInventoryDialog(context),
+                  onPressed: () => onAddInventoryPressed(product),
                 ),
               ],
             ),
@@ -339,5 +345,3 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-
-

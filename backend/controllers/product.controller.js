@@ -25,9 +25,7 @@ export const createProduct = async (req, res) => {
       }
   
     
-      const qrData = JSON.stringify({ warehouse_id, location_id, name , description });
-  
- 
+      const qrData = `https://3027-42-114-203-46.ngrok-free.app/api/product/get/${warehouse_id}/${location_id}`;
       const qrCode = await toDataURL(qrData);
   
  
@@ -91,9 +89,10 @@ export const createProduct = async (req, res) => {
                       name: product.name,
                       description: product.description,
                       warehouse_name: warehouse.name,
-                      location_shelf: location.shelf, // 🛠️ Đổi từ `location.name` thành `location.shelf`
+                      location_shelf: location.shelf, 
                       location_bin: location.bin,
                       quantity: inventory ? inventory.quantity : 0,
+                      batch: inventory ? inventory.batch : "Không có thông tin",
                       createdAt: inventory ? inventory.createdAt : null,
                       qr_code: product.qr_code,
                   };

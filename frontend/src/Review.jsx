@@ -3,27 +3,27 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const Review = () => {
-  const { warehouse_id, location_id } = useParams(); 
-  console.log(location_id)
-  console.log(warehouse_id)
+  const { warehouse_id, location_id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `/api/product/get/${warehouse_id}/${location_id}`
+          `https://3027-42-114-203-46.ngrok-free.app/api/product/get/${warehouse_id}/${location_id}`
         );
         
-        if (response.data.success) {
-          setProduct(response.data.products[0]); 
+        if (response.data.success && response.data.products.length > 0) {
+          setProduct(response.data.products[0]);
         } else {
           setProduct(null);
+          setError("Không tìm thấy sản phẩm.");
         }
       } catch (error) {
         console.error("Lỗi khi tải sản phẩm:", error);
-        setProduct(null);
+        setError("Có lỗi khi tải dữ liệu, vui lòng thử lại.");
       } finally {
         setLoading(false);
       }
@@ -34,46 +34,65 @@ const Review = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-200">
-        <p className="text-gray-700 text-lg">Đang tải...</p>
+      <div className="flex justify-center items-center h-screen bg-gradient-to-b from-blue-50 to-white">
+        <p className="text-gray-700 text-lg font-semibold animate-pulse">
+          Đang tải...
+        </p>
       </div>
     );
 
-  if (!product)
+  if (error)
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-200">
-        <p className="text-red-600 text-lg">Không tìm thấy sản phẩm.</p>
+      <div className="flex justify-center items-center h-screen bg-gradient-to-b from-blue-50 to-white">
+        <p className="text-red-600 text-lg font-semibold">{error}</p>
       </div>
     );
+
+  // Chuyển đổi ngày nhập hàng thành định dạng dễ đọc hơn
+  const formattedDate = product.createdAt
+    ? new Date(product.createdAt).toLocaleString("vi-VN")
+    : "Không rõ";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-200">
-      <div className="max-w-lg w-full bg-white shadow-md rounded-2xl py-8 px-6 border border-gray-300 min-h-[500px] flex flex-col justify-between">
-      
-        <div className="pb-4 border-b border-gray-300 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 uppercase tracking-wide">
-            {product.name}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white">
+      <div className="max-w-lg w-full bg-white shadow-lg rounded-xl py-8 px-6 border border-gray-300 min-h-[500px] flex flex-col">
+        <div className="pb-4 border-b border-gray-200 text-center">
+          <h2 className="text-3xl font-bold text-gray-800 uppercase tracking-wide">
+            {product.name || "Không có tên"}
           </h2>
-          <p className="text-gray-700 text-sm mt-1">{product.description}</p>
+          <p className="text-gray-600 text-sm mt-1">
+            {product.description || "Không có mô tả"}
+          </p>
         </div>
 
-        <div className="pt-4 space-y-3 text-gray-800 flex-grow">
-          <p>
-            <span className="font-bold text-gray-900 mr-2">Vị trí kho:</span> 
-            <span className="text-gray-700">{product.warehouse_name}</span>
-          </p>
-          <p>
-            <span className="font-bold text-gray-900 mr-2">Kệ:</span> 
-            <span className="text-gray-700">{product.location_shelf}</span>
-          </p>
-          <p>
-            <span className="font-bold text-gray-900 mr-2">Hộc:</span> 
-            <span className="text-gray-700">{product.location_bin}</span>
-          </p>
-          <p>
-            <span className="font-bold text-gray-900 mr-2">Số lượng:</span> 
-            <span className="text-gray-700">{product.quantity}</span>
-          </p>
+        <div className="pt-6 grid grid-cols-2 gap-y-4 gap-x-3 text-gray-800">
+          <span className="font-bold text-green-950">Vị trí kho:</span>
+          <span className="text-gray-700 font-semibold">
+            {product.warehouse_name || "Không có"}
+          </span>
+
+          <span className="font-bold text-green-950">Kệ:</span>
+          <span className="text-gray-700 font-semibold">
+            {product.location_shelf || "Không có"}
+          </span>
+
+          <span className="font-bold text-green-950">Hộc:</span>
+          <span className="text-gray-700 font-semibold">
+            {product.location_bin || "Không có"}
+          </span>
+
+          <span className="font-bold text-green-950">Số lượng:</span>
+          <span className="text-gray-700 font-semibold">
+            {product.quantity ?? "Không rõ"}
+          </span>
+
+          <span className="font-bold text-green-950">Lô hàng:</span>
+          <span className="text-gray-700 font-semibold">
+            {product.batch || "Không có batch"}
+          </span>
+
+          <span className="font-bold text-green-950">Ngày nhập hàng:</span>
+          <span className="text-gray-700 font-semibold">{formattedDate}</span>
         </div>
       </div>
     </div>
