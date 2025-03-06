@@ -25,7 +25,7 @@ export const createProduct = async (req, res) => {
       }
   
     
-      const qrData = `https://3027-42-114-203-46.ngrok-free.app/api/product/get/${warehouse_id}/${location_id}`;
+      const qrData = `https://3027-42-114-203-46.ngrok-free.app/product/get/${warehouse_id}/${location_id}`;
       const qrCode = await toDataURL(qrData);
   
  
