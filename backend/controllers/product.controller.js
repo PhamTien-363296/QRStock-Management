@@ -25,7 +25,7 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Vui lòng nhập đầy đủ thông tin." });
     }
 
-    // Tạo sản phẩm mới nhưng chưa có qr_code
+  
     const newProduct = new Product({
       warehouse_id,
       location_id,
@@ -33,19 +33,19 @@ export const createProduct = async (req, res) => {
       description,
     });
 
-    // Lưu sản phẩm vào cơ sở dữ liệu để có _id
+  
     await newProduct.save();
 
-    // Tạo URL cho QR code với _id của sản phẩm
+ 
     const qrData = `https://94d0-42-114-203-46.ngrok-free.app/product/g/${warehouse_id}/${location_id}/${newProduct._id}?timestamp=${new Date().getTime()}&unique_id=${uuidv4()}`;
     
-    // Tạo QR code từ URL
+
     const qrCode = await toDataURL(qrData);
 
-    // Cập nhật lại qr_code vào sản phẩm
+
     newProduct.qr_code = qrCode;
 
-    // Lưu lại sản phẩm với qr_code
+ 
     await newProduct.save();
 
     return res.status(201).json({ success: true, message: "Thêm sản phẩm thành công!", product: newProduct });
