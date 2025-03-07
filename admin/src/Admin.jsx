@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navbar } from './Navbar';
 
 export const Admin = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -26,7 +27,8 @@ export const Admin = () => {
   ];
 
   return (
-    <div className="bg-gray-100 min-h-screen p-6">
+    <Navbar>
+      <div className="bg-gray-100 min-h-screen p-6">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Admin - Quản lý xuất kho</h1>
 
   
@@ -127,5 +129,6 @@ export const Admin = () => {
         </div>
       )}
     </div>
+    </Navbar>
   );
 };

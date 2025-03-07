@@ -102,7 +102,7 @@ class _LocationScreenState extends State<LocationScreen> {
         const SnackBar(content: Text("Thêm Location thành công!")),
       );
       Navigator.pop(context);
-      _fetchLocations(); // Cập nhật danh sách location
+      _fetchLocations(); 
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Lỗi: ${result['error']}")),

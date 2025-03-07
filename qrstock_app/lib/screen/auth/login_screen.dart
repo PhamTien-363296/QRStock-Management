@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("jwt_token", token);
 
-    // ✅ Kiểm tra JWT đã lưu
+
     final storedToken = await AuthService.getToken();
     LogService.info("Stored JWT after login: $storedToken");
 

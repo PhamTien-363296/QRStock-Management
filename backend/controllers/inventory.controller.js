@@ -47,7 +47,7 @@ export const addInventory = async (req, res) => {
         await location.save();
 
         
-        const qrData = `https://94d0-42-114-203-46.ngrok-free.app/product/g/${warehouse_id}/${location_id}/${product_id}?timestamp=${new Date().getTime()}&unique_id=${uuidv4()}`;
+        const qrData = `https://qrfrontend.vercel.app/product/g/${warehouse_id}/${location_id}/${product_id}?timestamp=${new Date().getTime()}&unique_id=${uuidv4()}`;
         const qrCode = await toDataURL(qrData);
 
 

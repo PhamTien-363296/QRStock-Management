@@ -76,5 +76,35 @@ class ProductService {
   }
 }
 
+static Future<Map<String, dynamic>> getProductByWHLCPDId(
+    String warehouseId, String locationId, {String? productId}) async {
+
+  final Uri url = Uri.parse(
+      "$baseUrl/api/product/get/$warehouseId/$locationId${productId != null ? '/$productId' : ''}");
+  
+
+
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return {"success": true, "data": jsonDecode(response.body)["products"]};
+    } else {
+      return {
+        "success": false,
+        "error": jsonDecode(response.body)["message"] ?? "Lỗi khi lấy thông tin sản phẩm"
+      };
+    }
+  } catch (e) {
+    return {"success": false, "error": "Lỗi kết nối: $e"};
+  }
+}
+
+
 
 }
